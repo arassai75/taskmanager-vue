@@ -1,7 +1,7 @@
 <template>
-  <div id="app" class="min-h-screen bg-gray-50">
+  <div id="app" class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 flex flex-col">
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
+    <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <!-- Logo and Title -->
@@ -10,15 +10,16 @@
               <i class="fas fa-tasks text-white text-sm"></i>
             </div>
             <div>
-              <h1 class="text-xl font-bold text-gray-900">TaskManager</h1>
-              <p class="text-xs text-gray-500">Efficient Task Management</p>
+              <h1 class="text-xl font-bold text-gray-900 dark:text-white">TaskManager</h1>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Efficient Task Management</p>
             </div>
           </div>
 
           <!-- Header Actions -->
           <div class="flex items-center gap-4">
+
             <!-- Statistics Summary -->
-            <div class="hidden md:flex items-center gap-4 text-sm text-gray-600">
+            <div class="hidden md:flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
               <div class="flex items-center gap-1">
                 <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
                 <span>{{ taskStore.taskCounts.active }} Active</span>
@@ -33,30 +34,40 @@
               </div>
             </div>
 
-            <!-- Theme Toggle (Future Enhancement) -->
+            <!-- Theme Toggle -->
             <button
-              class="p-2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
-              title="Toggle theme (coming soon)"
-              disabled
+              @click="toggleTheme"
+              class="relative p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200"
+              title="Toggle theme"
             >
-              <i class="fas fa-moon"></i>
+              <!-- Sun icon for light mode -->
+              <i 
+                v-if="currentTheme === 'dark'"
+                class="fas fa-sun text-yellow-500 text-lg"
+              ></i>
+              <!-- Moon icon for dark mode -->
+              <i 
+                v-else
+                class="fas fa-moon text-gray-600 text-lg"
+              ></i>
             </button>
+
           </div>
         </div>
       </div>
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 dark:text-gray-100 w-full">
       <!-- Loading Overlay -->
       <div
         v-if="taskStore.loading.isLoading && taskStore.tasks.length === 0"
         class="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-40"
       >
-        <div class="bg-white rounded-lg p-6 shadow-xl">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-xl">
           <div class="flex items-center gap-3">
             <i class="fas fa-spinner fa-spin text-primary-600 text-xl"></i>
-            <span class="text-gray-700">Loading TaskManager...</span>
+            <span class="text-gray-700 dark:text-gray-300">Loading TaskManager...</span>
           </div>
         </div>
       </div>
@@ -84,35 +95,101 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-16">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div class="text-sm text-gray-600">
-            <span>&copy; 2024 TaskManager. Built with </span>
-            <span class="text-primary-600 font-medium">Vue 3</span>
-            <span> and </span>
-            <span class="text-primary-600 font-medium">.NET 8</span>
+    <footer class="mt-auto bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 border-t border-gray-200 dark:border-gray-700 transition-colors duration-300">
+      <!-- Decorative top border -->
+      <div class="h-1 bg-gradient-to-r from-primary-500 via-purple-500 to-primary-600"></div>
+      
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+          <!-- Brand Section -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-center md:justify-start gap-2">
+              <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <i class="fas fa-tasks text-white text-sm"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white">TaskManager</h3>
+            </div>
+            <p class="text-gray-300 text-sm leading-relaxed">
+              Efficient task management for productive teams. Built with modern technologies for optimal performance.
+            </p>
+            <div class="flex items-center justify-center md:justify-start gap-1 text-xs text-gray-400">
+              <i class="fas fa-rocket text-primary-400"></i>
+              <span>Version 1.1.0</span>
+            </div>
           </div>
-          
-          <div class="flex items-center gap-4 text-sm text-gray-500">
-            <a
-              href="/api"
-              target="_blank"
-              class="hover:text-primary-600 transition-colors duration-200"
-            >
-              <i class="fas fa-code mr-1"></i>
-              API Docs
-            </a>
-            <a
-              href="/swagger"
-              target="_blank"
-              class="hover:text-primary-600 transition-colors duration-200"
-            >
-              <i class="fas fa-book mr-1"></i>
-              Swagger
-            </a>
-            <div class="text-xs text-gray-400">
-              v1.0.0
+
+          <!-- Tech Stack -->
+          <div class="space-y-3">
+            <h4 class="text-sm font-semibold text-white uppercase tracking-wider">Built With</h4>
+            <div class="space-y-2">
+              <div class="flex items-center justify-center md:justify-start gap-2 text-sm text-gray-300">
+                <div class="w-4 h-4 bg-green-500 rounded flex items-center justify-center">
+                  <i class="fab fa-vuejs text-white text-xs"></i>
+                </div>
+                <span class="font-medium text-green-400">Vue 3</span>
+                <span class="text-gray-500">+</span>
+                <span class="text-blue-400">TypeScript</span>
+              </div>
+              <div class="flex items-center justify-center md:justify-start gap-2 text-sm text-gray-300">
+                <div class="w-4 h-4 bg-purple-600 rounded flex items-center justify-center">
+                  <i class="fab fa-microsoft text-white text-xs"></i>
+                </div>
+                <span class="font-medium text-purple-400">.NET 9</span>
+                <span class="text-gray-500">+</span>
+                <span class="text-blue-400">SQLite</span>
+              </div>
+              <div class="flex items-center justify-center md:justify-start gap-2 text-sm text-gray-300">
+                <div class="w-4 h-4 bg-cyan-500 rounded flex items-center justify-center">
+                  <i class="fas fa-wind text-white text-xs"></i>
+                </div>
+                <span class="font-medium text-cyan-400">Tailwind CSS</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Links & Stats -->
+          <div class="space-y-3">
+            <h4 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h4>
+            <div class="space-y-2">
+              <a
+                href="http://localhost:5001/swagger/index.html"
+                target="_blank"
+                class="flex items-center justify-center md:justify-start gap-2 text-sm text-gray-300 hover:text-primary-400 transition-colors duration-200 group"
+              >
+                <i class="fas fa-book text-primary-500 group-hover:text-primary-400"></i>
+                <span>API Documentation</span>
+                <i class="fas fa-external-link-alt text-xs opacity-50"></i>
+              </a>
+              <div class="flex items-center justify-center md:justify-start gap-2 text-sm text-gray-300">
+                <i class="fas fa-server text-green-500"></i>
+                <span>API Status: </span>
+                <span class="text-green-400 font-medium">Online</span>
+              </div>
+              <div class="flex items-center justify-center md:justify-start gap-2 text-sm text-gray-300">
+                <i class="fas fa-tasks text-blue-500"></i>
+                <span>Tasks Managed: </span>
+                <span class="text-blue-400 font-medium">{{ taskStore.taskCounts.total }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Bar -->
+        <div class="mt-8 pt-6 border-t border-gray-700 dark:border-gray-600">
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
+            <div class="text-gray-400">
+              <span>&copy; 2024 TaskManager. Made with </span>
+              <i class="fas fa-heart text-red-500 mx-1 animate-pulse"></i>
+              <span>for productivity.</span>
+            </div>
+            <div class="flex items-center gap-4 text-gray-400">
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="text-xs">Live</span>
+              </div>
+              <div class="text-xs">
+                {{ new Date().getFullYear() }}
+              </div>
             </div>
           </div>
         </div>
@@ -137,12 +214,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useTaskStore } from '@/stores/taskStore'
-import TaskList from '@/components/TaskList.vue'
-import TaskForm from '@/components/TaskForm.vue'
-import NotificationManager from '@/components/NotificationManager.vue'
-import ConfirmationModal from '@/components/ConfirmationModal.vue'
-import type { Task, CreateTaskDto, UpdateTaskDto } from '@/types'
+import { useTaskStore } from './stores/taskStore'
+import TaskList from './components/TaskList.vue'
+import TaskForm from './components/TaskForm.vue'
+import NotificationManager from './components/NotificationManager.vue'
+import ConfirmationModal from './components/ConfirmationModal.vue'
+import type { Task, CreateTaskDto, UpdateTaskDto } from './types'
 
 // Store
 const taskStore = useTaskStore()
@@ -156,6 +233,41 @@ const formSubmitting = ref(false)
 // Delete confirmation state
 const showDeleteConfirmation = ref(false)
 const taskToDelete = ref<Task | undefined>(undefined)
+
+// Theme management
+const currentTheme = ref<'light' | 'dark'>('light')
+
+// Initialize theme on app load
+onMounted(() => {
+  // Check localStorage first, then system preference
+  const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
+  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  
+  currentTheme.value = savedTheme || systemTheme
+  applyTheme(currentTheme.value)
+  
+  // Listen for system theme changes
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (!localStorage.getItem('theme')) {
+      currentTheme.value = e.matches ? 'dark' : 'light'
+      applyTheme(currentTheme.value)
+    }
+  })
+})
+
+function toggleTheme() {
+  currentTheme.value = currentTheme.value === 'light' ? 'dark' : 'light'
+  applyTheme(currentTheme.value)
+  localStorage.setItem('theme', currentTheme.value)
+}
+
+function applyTheme(theme: 'light' | 'dark') {
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark')
+  } else {
+    document.documentElement.classList.remove('dark')
+  }
+}
 
 // Methods
 function showCreateForm() {

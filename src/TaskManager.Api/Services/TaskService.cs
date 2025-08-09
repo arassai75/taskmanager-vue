@@ -126,16 +126,8 @@ public class TaskService : ITaskService
                 }
             }
 
-            var task = new TaskItem
-            {
-                Title = createTaskDto.Title,
-                Description = createTaskDto.Description,
-                Priority = createTaskDto.Priority,
-                CategoryId = createTaskDto.CategoryId,
-                IsCompleted = false,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
+            // Use AutoMapper to create task entity from DTO
+            var task = _mapper.Map<TaskItem>(createTaskDto);
 
             _context.Tasks.Add(task);
             await _context.SaveChangesAsync();
@@ -187,10 +179,8 @@ public class TaskService : ITaskService
             }
 
             // Update task properties
-            task.Title = updateTaskDto.Title;
-            task.Description = updateTaskDto.Description;
-            task.Priority = updateTaskDto.Priority;
-            task.CategoryId = updateTaskDto.CategoryId;
+            // Use AutoMapper to update task entity from DTO
+            _mapper.Map(updateTaskDto, task);
             task.MarkAsUpdated();
 
             await _context.SaveChangesAsync();

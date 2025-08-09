@@ -23,6 +23,8 @@ public class TaskContext : DbContext
     /// </summary>
     public DbSet<Category> Categories { get; set; }
 
+
+
     /// <summary>
     /// Configures entity relationships and constraints
     /// </summary>
@@ -36,6 +38,7 @@ public class TaskContext : DbContext
 
         // Configure Category entity
         ConfigureCategory(modelBuilder);
+
 
         // Seed initial data
         SeedData(modelBuilder);
@@ -81,6 +84,17 @@ public class TaskContext : DbContext
             entity.Property(e => e.IsDeleted)
                 .IsRequired()
                 .HasDefaultValue(false);
+            
+            // New v1.1.0 properties
+            entity.Property(e => e.DueDate)
+                .HasColumnType("DATETIME");
+            
+            entity.Property(e => e.EstimatedHours)
+                .HasColumnType("DECIMAL(6,2)");
+            
+            entity.Property(e => e.NotificationsEnabled)
+                .IsRequired()
+                .HasDefaultValue(true);
 
             // Relationships
             entity.HasOne(e => e.Category)
@@ -100,6 +114,16 @@ public class TaskContext : DbContext
             
             entity.HasIndex(e => new { e.IsCompleted, e.Priority, e.IsDeleted })
                 .HasDatabaseName("IX_Tasks_Status_Priority");
+            
+            // New v1.1.0 indexes
+            entity.HasIndex(e => e.DueDate)
+                .HasDatabaseName("IX_Tasks_DueDate");
+            
+            entity.HasIndex(e => e.EstimatedHours)
+                .HasDatabaseName("IX_Tasks_EstimatedHours");
+            
+            entity.HasIndex(e => new { e.DueDate, e.NotificationsEnabled, e.IsCompleted })
+                .HasDatabaseName("IX_Tasks_Notifications");
 
             // Check constraints using modern EF Core syntax
             entity.ToTable(t =>
@@ -108,6 +132,10 @@ public class TaskContext : DbContext
                 t.HasCheckConstraint("CK_Tasks_Priority_Valid", "Priority IN (1, 2, 3)");
                 t.HasCheckConstraint("CK_Tasks_DeletedAt_Logic", 
                     "(IsDeleted = 0 AND DeletedAt IS NULL) OR (IsDeleted = 1 AND DeletedAt IS NOT NULL)");
+                t.HasCheckConstraint("CK_Tasks_EstimatedHours_Positive", 
+                    "EstimatedHours IS NULL OR EstimatedHours > 0");
+                t.HasCheckConstraint("CK_Tasks_EstimatedHours_Reasonable", 
+                    "EstimatedHours IS NULL OR EstimatedHours <= 999.99");
             });
         });
     }
@@ -159,6 +187,8 @@ public class TaskContext : DbContext
         });
     }
 
+
+
     /// <summary>
     /// Seeds initial data for development and testing
     /// </summary>
@@ -172,7 +202,7 @@ public class TaskContext : DbContext
                 Name = "General", 
                 Description = "General tasks without specific category", 
                 Color = "#6B7280",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             },
             new Category 
             { 
@@ -180,7 +210,7 @@ public class TaskContext : DbContext
                 Name = "Work", 
                 Description = "Work-related tasks and projects", 
                 Color = "#3B82F6",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             },
             new Category 
             { 
@@ -188,7 +218,7 @@ public class TaskContext : DbContext
                 Name = "Personal", 
                 Description = "Personal tasks and reminders", 
                 Color = "#10B981",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             },
             new Category 
             { 
@@ -196,12 +226,12 @@ public class TaskContext : DbContext
                 Name = "Urgent", 
                 Description = "High priority urgent tasks", 
                 Color = "#EF4444",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
             }
         );
 
         // Seed Sample Tasks
-        var now = DateTime.UtcNow;
+        var now = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         modelBuilder.Entity<TaskItem>().HasData(
             new TaskItem 
             { 
@@ -210,6 +240,9 @@ public class TaskContext : DbContext
                 Description = "Write comprehensive documentation for the TaskManager API",
                 Priority = 2,
                 CategoryId = 2,
+                DueDate = now.AddDays(3),
+                EstimatedHours = 2.5m,
+                NotificationsEnabled = true,
                 CreatedAt = now.AddDays(-5),
                 UpdatedAt = now.AddDays(-5)
             },
@@ -220,6 +253,9 @@ public class TaskContext : DbContext
                 Description = "Review and approve pending pull requests in the repository",
                 Priority = 2,
                 CategoryId = 2,
+                DueDate = now.AddDays(1),
+                EstimatedHours = 1.0m,
+                NotificationsEnabled = true,
                 CreatedAt = now.AddDays(-3),
                 UpdatedAt = now.AddDays(-3)
             },
@@ -230,6 +266,9 @@ public class TaskContext : DbContext
                 Description = "Weekly grocery shopping - milk, bread, fruits",
                 Priority = 1,
                 CategoryId = 3,
+                DueDate = now.AddDays(7),
+                EstimatedHours = 0.5m,
+                NotificationsEnabled = true,
                 CreatedAt = now.AddDays(-2),
                 UpdatedAt = now.AddDays(-2)
             },
@@ -240,6 +279,9 @@ public class TaskContext : DbContext
                 Description = "Annual dental checkup appointment",
                 Priority = 2,
                 CategoryId = 3,
+                DueDate = now.AddDays(2),
+                EstimatedHours = 1.5m,
+                NotificationsEnabled = true,
                 CreatedAt = now.AddDays(-1),
                 UpdatedAt = now.AddDays(-1)
             },
@@ -251,10 +293,15 @@ public class TaskContext : DbContext
                 Priority = 3,
                 CategoryId = 2,
                 IsCompleted = true,
+                EstimatedHours = 4.0m,
+                NotificationsEnabled = false,
                 CreatedAt = now.AddDays(-4),
                 UpdatedAt = now.AddDays(-1)
             }
         );
+
+
+
     }
 
     /// <summary>
@@ -282,7 +329,8 @@ public class TaskContext : DbContext
     {
         var entries = ChangeTracker
             .Entries()
-            .Where(e => e.State == EntityState.Modified && e.Entity is TaskItem);
+            .Where(e => e.State == EntityState.Modified && 
+                       e.Entity is TaskItem);
 
         foreach (var entry in entries)
         {
@@ -300,6 +348,7 @@ public class TaskContext : DbContext
                     task.DeletedAt = null;
                 }
             }
+
         }
     }
 }

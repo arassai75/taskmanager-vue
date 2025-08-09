@@ -142,6 +142,20 @@ fi
 
 print_color $GREEN "✅ Database schema created successfully"
 
+# Apply v1.1.0 schema updates if available
+SCHEMA_UPDATE_FILE="$DATABASE_DIR/schema/02_v1.1.0_schema_updates.sql"
+if [ -f "$SCHEMA_UPDATE_FILE" ]; then
+    print_color $YELLOW "📋 Applying v1.1.0 schema updates..."
+    sqlite3 "$DB_PATH" < "$SCHEMA_UPDATE_FILE"
+    
+    if [ $? -ne 0 ]; then
+        print_color $RED "❌ Failed to apply v1.1.0 updates"
+        exit 1
+    fi
+    
+    print_color $GREEN "✅ v1.1.0 updates applied successfully"
+fi
+
 # Execute stored procedures (views in SQLite)
 print_color $YELLOW "📊 Creating views and procedures..."
 sqlite3 "$DB_PATH" < "$DATABASE_DIR/stored_procedures/sp_task_operations.sql"

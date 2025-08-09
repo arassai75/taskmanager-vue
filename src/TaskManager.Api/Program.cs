@@ -20,6 +20,8 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 // Register application services
 builder.Services.AddScoped<ITaskService, TaskService>();
 
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
 // Add CORS for Vue.js frontend
 builder.Services.AddCors(options =>
 {
@@ -36,15 +38,15 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo
+    c.SwaggerDoc("v1.1.0", new OpenApiInfo
     {
         Title = "TaskManager API",
-        Version = "v1",
+        Version = "v1.1.0",
         Description = "A comprehensive task management API with stored procedure support",
         Contact = new OpenApiContact
         {
-            Name = "TaskManager Development Team",
-            Email = "dev@taskmanager.com"
+            Name = "Development Team",
+            Email = "arassai75+taskmanager@gmail.com"
         }
     });
 
@@ -73,7 +75,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "TaskManager API v1");
+        c.SwaggerEndpoint("/swagger/v1.1.0/swagger.json", "TaskManager API v1.1.0");
         c.RoutePrefix = "swagger";
         c.DocumentTitle = "TaskManager API Documentation";
     });
@@ -116,6 +118,8 @@ app.MapGet("/api", () => Results.Ok(new
     Endpoints = new
     {
         Tasks = "/api/tasks",
+        Categories = "/api/categories",
+
         Documentation = "/swagger",
         Health = "/health"
     }
@@ -135,15 +139,8 @@ using (var scope = app.Services.CreateScope())
     
     try
     {
-        logger.LogInformation("Ensuring database is created...");
-        context.Database.EnsureCreated();
-        
-        // Optionally run migrations if they exist
-        if (context.Database.GetPendingMigrations().Any())
-        {
-            logger.LogInformation("Running pending migrations...");
-            context.Database.Migrate();
-        }
+        logger.LogInformation("Applying database migrations...");
+        context.Database.Migrate();
         
         logger.LogInformation("Database initialization completed successfully");
     }

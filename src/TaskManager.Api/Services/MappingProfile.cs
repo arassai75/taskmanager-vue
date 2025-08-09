@@ -14,6 +14,7 @@ public class MappingProfile : Profile
     {
         ConfigureTaskMappings();
         ConfigureCategoryMappings();
+
     }
 
     /// <summary>
@@ -27,7 +28,10 @@ public class MappingProfile : Profile
                 src.Category != null ? src.Category.Name : "Uncategorized"))
             .ForMember(dest => dest.CategoryColor, opt => opt.MapFrom(src => 
                 src.Category != null ? src.Category.Color : null))
-            .ForMember(dest => dest.PriorityText, opt => opt.MapFrom(src => src.PriorityText));
+            .ForMember(dest => dest.PriorityText, opt => opt.MapFrom(src => src.PriorityText))
+            .ForMember(dest => dest.IsOverdue, opt => opt.MapFrom(src => src.IsOverdue))
+            .ForMember(dest => dest.IsDueSoon, opt => opt.MapFrom(src => src.IsDueSoon))
+            .ForMember(dest => dest.DueStatus, opt => opt.MapFrom(src => src.DueStatus));
 
         // CreateTaskDto to TaskItem mapping
         CreateMap<CreateTaskDto, TaskItem>()
@@ -78,5 +82,6 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Tasks, opt => opt.Ignore())
             .AfterMap((src, dest) => src.Normalize());
     }
-}
 
+
+}

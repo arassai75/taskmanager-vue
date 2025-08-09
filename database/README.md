@@ -1,100 +1,193 @@
-# Database Documentation
+# TaskManager Database Management
 
-This directory contains all database-related scripts and documentation for the TaskManager application.
+This directory contains database-related files and documentation for the TaskManager application.
 
-## Structure
+## Overview
+
+The TaskManager application now uses **EF Core Migrations** for proper database versioning and deployment management. This ensures that schema changes are tracked, versioned, and can be deployed consistently across different environments.
+
+## Directory Structure
 
 ```
 database/
-├── README.md                           # This file
-├── schema/
-│   └── 01_create_schema.sql           # Initial database schema creation
-└── stored_procedures/
-    └── sp_task_operations.sql         # All task-related stored procedures
+├── README.md              # This file
+├── backups/               # Automated database backups
+└── schema/                # Legacy SQL scripts (kept for reference)
+    ├── 01_create_schema.sql
+    └── 02_v1.1.0_schema_updates.sql
 ```
 
-## Database Design
+## Database Environments
 
-### Tables
+- **Development**: `taskmanager-dev.db` (used when ASPNETCORE_ENVIRONMENT=Development)
+- **Production**: `taskmanager.db` (used when ASPNETCORE_ENVIRONMENT=Production)
+
+## Migration System
+
+### Current Migrations
+
+1. **20250809214103_InitialCreate** - Initial database schema with all v1.1.0 features
+   - Tasks table with DueDate, EstimatedHours, NotificationsEnabled
+   - Categories table with color support
+   - Proper indexes and constraints
+   - Sample seed data
+
+### EF Core Migration Files
+
+Migrations are stored in `src/TaskManager.Api/Migrations/`:
+- `*.cs` - Migration code files
+- `*Designer.cs` - Migration metadata
+- `TaskContextModelSnapshot.cs` - Current model snapshot
+
+## Database Deployment Script
+
+Use the `deploy-db.sh` script for all database operations:
+
+### Basic Commands
+
+```bash
+# Check migration status
+./deploy-db.sh dev status
+./deploy-db.sh prod status
+
+# Apply pending migrations
+./deploy-db.sh dev migrate
+./deploy-db.sh prod migrate
+
+# Create database backup
+./deploy-db.sh dev backup
+./deploy-db.sh prod backup
+
+# Sync development schema to production
+./deploy-db.sh prod sync
+
+# Reset database (WARNING: Data loss!)
+./deploy-db.sh dev reset
+./deploy-db.sh prod reset
+
+# Rollback last migration
+./deploy-db.sh dev rollback
+./deploy-db.sh prod rollback
+```
+
+### Deployment Workflow
+
+1. **Development Changes**:
+   ```bash
+   # After modifying models, create migration
+   cd src/TaskManager.Api
+   dotnet ef migrations add YourMigrationName
+   
+   # Apply to development
+   ./deploy-db.sh dev migrate
+   ```
+
+2. **Production Deployment**:
+   ```bash
+   # Sync development schema to production
+   ./deploy-db.sh prod sync
+   
+   # OR apply specific migrations
+   ./deploy-db.sh prod migrate
+   ```
+
+### Safety Features
+
+- **Automatic Backups**: All operations that modify data create timestamped backups
+- **Confirmation Prompts**: Destructive operations require explicit confirmation
+- **Environment Isolation**: Clear separation between dev and prod databases
+- **Migration Tracking**: Full audit trail of schema changes
+
+## Schema Changes
+
+When making schema changes:
+
+1. **Modify the EF Core models** in `src/TaskManager.Api/Models/`
+2. **Update the DbContext** in `src/TaskManager.Api/Data/TaskContext.cs` if needed
+3. **Create a migration**:
+   ```bash
+   cd src/TaskManager.Api
+   dotnet ef migrations add YourChangeDescription
+   ```
+4. **Test in development**:
+   ```bash
+   ./deploy-db.sh dev migrate
+   ```
+5. **Deploy to production**:
+   ```bash
+   ./deploy-db.sh prod sync
+   ```
+
+## Database Schema
+
+### Current Tables
 
 #### Tasks
-- **Purpose**: Store all task information
-- **Primary Key**: Id (auto-increment)
-- **Features**: 
-  - Supports soft delete (IsDeleted flag)
-  - Tracks creation and modification timestamps
-  - Optimized with indexes on frequently queried columns
+- **Core Fields**: Id, Title, Description, IsCompleted, Priority
+- **Categorization**: CategoryId (FK to Categories)
+- **v1.1.0 Features**: DueDate, EstimatedHours, NotificationsEnabled
+- **Audit**: CreatedAt, UpdatedAt, IsDeleted, DeletedAt
 
-### Stored Procedures
+#### Categories
+- **Core Fields**: Id, Name, Description, Color, IsActive
+- **Audit**: CreatedAt
 
-#### sp_GetAllTasks
-- **Purpose**: Retrieve all active tasks with optional filtering
-- **Parameters**: 
-  - `@IncludeCompleted` (BIT): Include completed tasks in results
-- **Returns**: All task columns ordered by CreatedAt DESC
+### Constraints and Indexes
 
-#### sp_GetTaskById
-- **Purpose**: Retrieve a specific task by ID
-- **Parameters**:
-  - `@TaskId` (INT): The task ID to retrieve
-- **Returns**: Single task record or NULL if not found
+- **Performance Indexes**: Optimized for common query patterns
+- **Data Validation**: Check constraints for data integrity
+- **Foreign Keys**: Referential integrity with cascade options
 
-#### sp_CreateTask
-- **Purpose**: Create a new task
-- **Parameters**:
-  - `@Title` (NVARCHAR(200)): Task title (required)
-  - `@Description` (NVARCHAR(1000)): Task description (optional)
-- **Returns**: The newly created task ID
+## Troubleshooting
 
-#### sp_ToggleTaskStatus
-- **Purpose**: Toggle the completion status of a task
-- **Parameters**:
-  - `@TaskId` (INT): The task ID to toggle
-- **Returns**: Updated task record
+### Common Issues
 
-#### sp_UpdateTask
-- **Purpose**: Update task details
-- **Parameters**:
-  - `@TaskId` (INT): The task ID to update
-  - `@Title` (NVARCHAR(200)): New title
-  - `@Description` (NVARCHAR(1000)): New description
-- **Returns**: Updated task record
+1. **Migration Conflicts**:
+   ```bash
+   # Check current status
+   ./deploy-db.sh dev status
+   
+   # Reset if needed
+   ./deploy-db.sh dev reset
+   ```
 
-#### sp_DeleteTask
-- **Purpose**: Soft delete a task (sets IsDeleted = 1)
-- **Parameters**:
-  - `@TaskId` (INT): The task ID to delete
-- **Returns**: Success status
+2. **Schema Sync Issues**:
+   ```bash
+   # Force sync from development
+   ./deploy-db.sh prod sync
+   ```
 
-## Setup Instructions
+3. **Backup and Restore**:
+   ```bash
+   # Manual backup
+   ./deploy-db.sh prod backup
+   
+   # Restore from backup
+   cp database/backups/prod_TIMESTAMP.db src/TaskManager.Api/taskmanager.db
+   ```
 
-1. **Create Database**: Run `01_create_schema.sql` to create the database structure
-2. **Create Procedures**: Run `sp_task_operations.sql` to create all stored procedures
-3. **Verify Setup**: Check that all tables and procedures exist
+### Database Files
 
-## Performance Considerations
+- Development: `src/TaskManager.Api/taskmanager-dev.db`
+- Production: `src/TaskManager.Api/taskmanager.db`
+- Backups: `database/backups/`
 
-- **Indexes**: Created on frequently queried columns (CreatedAt, IsCompleted, IsDeleted)
-- **Soft Delete**: Uses IsDeleted flag for better performance and data recovery
-- **Stored Procedures**: Optimized queries with proper parameter handling
-- **Data Types**: Appropriate sizes to minimize storage overhead
+## Migration History
 
-## Usage in Application
+| Version | Migration | Description |
+|---------|-----------|-------------|
+| v1.0.0 | InitialCreate | Initial schema with basic task management |
+| v1.1.0 | InitialCreate | Added DueDate, EstimatedHours, NotificationsEnabled |
 
-The .NET application uses Entity Framework Core with stored procedure calls:
+## Best Practices
 
-```csharp
-// Example usage
-var tasks = await _context.Database
-    .SqlQueryRaw<TaskItem>("EXEC sp_GetAllTasks @IncludeCompleted = {0}", true)
-    .ToListAsync();
-```
+1. **Always backup** before making schema changes
+2. **Test migrations** in development first
+3. **Use descriptive names** for migrations
+4. **Keep migrations small** and focused
+5. **Never modify existing migrations** that have been deployed
+6. **Use the deployment script** for all database operations
 
-## Benefits of This Approach
+## Legacy Files
 
-1. **Performance**: Compiled execution plans
-2. **Security**: Protection against SQL injection
-3. **Maintainability**: Database logic centralized in procedures
-4. **Flexibility**: Easy to modify business logic without code changes
-5. **Enterprise Ready**: Standard approach in enterprise applications
-
+The `database/schema/` directory contains legacy SQL scripts that were used before implementing EF Core migrations. These are kept for reference but should not be used for new deployments.

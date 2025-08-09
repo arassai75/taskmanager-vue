@@ -7,8 +7,10 @@ import type {
   TaskSearchDto, 
   PagedTasksDto, 
   TaskStatistics,
+
+  Category,
   ApiError 
-} from '@/types'
+} from '../types'
 
 // Create axios instance with default configuration
 const api: AxiosInstance = axios.create({
@@ -198,6 +200,21 @@ export const apiUtils = {
     }
 
     throw lastError
+  }
+}
+
+
+
+// Categories API
+export const categoriesApi = {
+  async getCategories(): Promise<Category[]> {
+    const response = await api.get<Category[]>('/categories')
+    return response.data
+  },
+
+  async getCategoryById(id: number): Promise<Category> {
+    const response = await api.get<Category>(`/categories/${id}`)
+    return response.data
   }
 }
 

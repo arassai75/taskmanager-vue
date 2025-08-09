@@ -16,6 +16,12 @@ public class TaskDto
     public int? CategoryId { get; set; }
     public string CategoryName { get; set; } = string.Empty;
     public string? CategoryColor { get; set; }
+    public DateTime? DueDate { get; set; }
+    public decimal? EstimatedHours { get; set; }
+    public bool NotificationsEnabled { get; set; } = true;
+    public bool IsOverdue { get; set; }
+    public bool IsDueSoon { get; set; }
+    public string DueStatus { get; set; } = "none";
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
@@ -37,6 +43,13 @@ public class CreateTaskDto
 
     [Range(1, int.MaxValue, ErrorMessage = "Category ID must be a positive number")]
     public int? CategoryId { get; set; }
+
+    public DateTime? DueDate { get; set; }
+
+    [Range(0.1, 999.99, ErrorMessage = "Estimated hours must be between 0.1 and 999.99")]
+    public decimal? EstimatedHours { get; set; }
+
+    public bool NotificationsEnabled { get; set; } = true;
 
     /// <summary>
     /// Validates and trims the input data
@@ -65,6 +78,13 @@ public class UpdateTaskDto
 
     [Range(1, int.MaxValue, ErrorMessage = "Category ID must be a positive number")]
     public int? CategoryId { get; set; }
+
+    public DateTime? DueDate { get; set; }
+
+    [Range(0.1, 999.99, ErrorMessage = "Estimated hours must be between 0.1 and 999.99")]
+    public decimal? EstimatedHours { get; set; }
+
+    public bool NotificationsEnabled { get; set; } = true;
 
     /// <summary>
     /// Validates and trims the input data
@@ -102,6 +122,12 @@ public class TaskSearchDto
 
     public DateTime? CreatedAfter { get; set; }
     public DateTime? CreatedBefore { get; set; }
+    
+    // New filtering options
+    public DateTime? DueBefore { get; set; }
+    public DateTime? DueAfter { get; set; }
+    public bool? IsOverdue { get; set; }
+    public bool? HasEstimate { get; set; }
 
     [Range(1, 100, ErrorMessage = "Page size must be between 1 and 100")]
     public int PageSize { get; set; } = 20;
@@ -142,6 +168,10 @@ public class TaskStatisticsDto
     public int CompletedTasks { get; set; }
     public int PendingTasks { get; set; }
     public int HighPriorityPending { get; set; }
+    public int OverdueTasks { get; set; }
+    public int DueSoonTasks { get; set; }
+    public decimal TotalEstimatedHours { get; set; }
+    public decimal CompletedEstimatedHours { get; set; }
     public double CompletionPercentage { get; set; }
 }
 
@@ -167,5 +197,9 @@ public class BulkUpdateTaskDto : BulkTaskOperationDto
 
     [Range(1, int.MaxValue, ErrorMessage = "Category ID must be a positive number")]
     public int? CategoryId { get; set; }
+
+    public DateTime? DueDate { get; set; }
+    public decimal? EstimatedHours { get; set; }
+    public bool? NotificationsEnabled { get; set; }
 }
 

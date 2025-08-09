@@ -10,6 +10,12 @@ export interface Task {
   categoryId?: number
   categoryName: string
   categoryColor?: string
+  dueDate?: string
+  estimatedHours?: number
+  notificationsEnabled: boolean
+  isOverdue: boolean
+  isDueSoon: boolean
+  dueStatus: 'none' | 'normal' | 'due_soon' | 'overdue'
   createdAt: string
   updatedAt: string
 }
@@ -19,6 +25,9 @@ export interface CreateTaskDto {
   description?: string
   priority: number
   categoryId?: number
+  dueDate?: string
+  estimatedHours?: number
+  notificationsEnabled?: boolean
 }
 
 export interface UpdateTaskDto {
@@ -26,6 +35,9 @@ export interface UpdateTaskDto {
   description?: string
   priority: number
   categoryId?: number
+  dueDate?: string
+  estimatedHours?: number
+  notificationsEnabled?: boolean
 }
 
 export interface TaskSearchDto {
@@ -98,6 +110,17 @@ export interface ApiError {
   detail: string
   status: number
   type?: string
+}
+
+
+
+// Notification Types
+export interface NotificationPayload {
+  title: string
+  body: string
+  icon?: string
+  tag?: string
+  data?: any
 }
 
 // Priority enumeration for better type safety
