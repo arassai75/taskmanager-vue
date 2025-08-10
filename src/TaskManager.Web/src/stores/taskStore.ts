@@ -86,7 +86,7 @@ export const useTaskStore = defineStore('tasks', () => {
       tasks.value = fetchedTasks
       showNotification('success', 'Tasks loaded', `${fetchedTasks.length} tasks loaded successfully`)
     } catch (error) {
-      console.error('❌ Failed to fetch tasks:', error)
+      console.error('Failed to fetch tasks:', error)
       const errorMessage = apiUtils.formatErrorMessage(error)
       setError(errorMessage)
       showNotification('error', 'Failed to load tasks', errorMessage)

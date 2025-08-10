@@ -44,7 +44,7 @@ builder.Services.AddSwaggerGen(c =>
         Contact = new OpenApiContact
         {
             Name = "TaskManager Development Team",
-            Email = "dev@taskmanager.com"
+            Email = "arassai75+taskmanager@gmail.com"
         }
     });
 

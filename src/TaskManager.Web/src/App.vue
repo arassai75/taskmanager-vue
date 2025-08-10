@@ -88,7 +88,7 @@
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
           <div class="text-sm text-gray-600">
-            <span>&copy; 2024 TaskManager. Built with </span>
+            <span>&copy; 2025 TaskManager. Built with </span>
             <span class="text-primary-600 font-medium">Vue 3</span>
             <span> and </span>
             <span class="text-primary-600 font-medium">.NET 8</span>
@@ -96,15 +96,7 @@
           
           <div class="flex items-center gap-4 text-sm text-gray-500">
             <a
-              href="/api"
-              target="_blank"
-              class="hover:text-primary-600 transition-colors duration-200"
-            >
-              <i class="fas fa-code mr-1"></i>
-              API Docs
-            </a>
-            <a
-              href="/swagger"
+              href="http://localhost:5001/swagger/"
               target="_blank"
               class="hover:text-primary-600 transition-colors duration-200"
             >

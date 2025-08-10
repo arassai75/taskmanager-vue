@@ -2,16 +2,16 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 
-// Create Vue app
+// Create Vue app 
 const app = createApp(App)
 
-// Create and use Pinia store
+// Create and use Pinia store for state management
 const pinia = createPinia()
 app.use(pinia)
 
 // Global error handler
 app.config.errorHandler = (err, instance, info) => {
-  console.error('Global error:', err)
+  console.error('Global error:', err) //
   console.error('Component instance:', instance)
   console.error('Error info:', info)
   
@@ -19,10 +19,12 @@ app.config.errorHandler = (err, instance, info) => {
   if (import.meta.env.PROD) {
     // Example: Send to error reporting service
     // errorReportingService.captureException(err, { extra: { info } })
+    // options: NewRelic, etc.
   }
 }
 
 // Global warning handler (development only)
+// Perfect for debugging
 if (import.meta.env.DEV) {
   app.config.warnHandler = (msg, _instance, trace) => {
     console.warn('Vue warning:', msg)
@@ -47,9 +49,9 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 }
 
 // Log app information
-console.log('🚀 TaskManager Vue App started')
-console.log('📝 Environment:', import.meta.env.MODE)
-console.log('🔗 API Base URL:', import.meta.env.VITE_API_BASE_URL || '/api')
+console.log('TaskManager Vue App started')
+console.log('Environment:', import.meta.env.MODE)
+console.log('API Base URL:', import.meta.env.VITE_API_BASE_URL || '/api')
 
 // Performance monitoring (development only)
 if (import.meta.env.DEV) {
