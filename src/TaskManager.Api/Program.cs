@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Api.Data;
 using TaskManager.Api.Services;
+using TaskManager.Api.DTOs;
 
 namespace TaskManager.Api
 {
@@ -13,7 +14,15 @@ namespace TaskManager.Api
             // Add services to the container
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "TaskManager API",
+                    Version = "1.1.0",
+                    Description = "An efficient task management API"
+                });
+            });
 
             // Add AutoMapper
             builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -52,7 +61,7 @@ namespace TaskManager.Api
             app.MapControllers();
 
             // Health check endpoint
-            app.MapGet("/health", () => new
+            app.MapGet("/health", () => new HealthCheckDto
             {
                 Status = "Healthy",
                 Timestamp = DateTime.UtcNow,
@@ -60,12 +69,12 @@ namespace TaskManager.Api
             });
 
             // API info endpoint
-            app.MapGet("/api", () => new
+            app.MapGet("/api", () => new ApiInfoDto
             {
                 Name = "TaskManager API",
                 Version = "1.1.0",
                 Description = "An efficient task management API",
-                Endpoints = new
+                Endpoints = new ApiEndpointsDto
                 {
                     Tasks = "/api/tasks",
                     Statistics = "/api/tasks/statistics",

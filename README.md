@@ -156,15 +156,5 @@ A simple task management application with Vue 3 frontend and .NET 8 backend.
 - Check SQLite file permissions
 - Verify migration status
 
-## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test everything works
-5. Submit a pull request
-
-## License
-
-MIT License - feel free to use this project for learning or commercial purposes.
 
