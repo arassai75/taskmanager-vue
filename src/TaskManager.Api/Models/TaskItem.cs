@@ -52,6 +52,22 @@ public class TaskItem
     public virtual Category? Category { get; set; }
 
     /// <summary>
+    /// Optional due date for the task
+    /// </summary>
+    public DateTime? DueDate { get; set; }
+
+    /// <summary>
+    /// Estimated hours to complete the task (decimal hours, nullable)
+    /// </summary>
+    [Range(0.1, 999.99)]
+    public decimal? EstimatedHours { get; set; }
+
+    /// <summary>
+    /// Whether notifications are enabled for this task
+    /// </summary>
+    public bool NotificationsEnabled { get; set; } = true;
+
+    /// <summary>
     /// Timestamp when the task was created
     /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -85,10 +101,30 @@ public class TaskItem
 
     /// <summary>
     /// Indicates if the task is overdue (has a due date in the past and is not completed)
-    /// Note: Due date functionality can be added in future iterations
     /// </summary>
     [NotMapped]
-    public bool IsOverdue => false; // Placeholder for future due date functionality
+    public bool IsOverdue => DueDate.HasValue && DueDate.Value < DateTime.UtcNow && !IsCompleted;
+
+    /// <summary>
+    /// Indicates if the task is due soon (within 24 hours and not completed)
+    /// </summary>
+    [NotMapped]
+    public bool IsDueSoon => DueDate.HasValue && DueDate.Value <= DateTime.UtcNow.AddDays(1) && !IsCompleted && !IsOverdue;
+
+    /// <summary>
+    /// Due status as text for UI display
+    /// </summary>
+    [NotMapped]
+    public string DueStatus
+    {
+        get
+        {
+            if (!DueDate.HasValue) return "none";
+            if (IsOverdue) return "overdue";
+            if (IsDueSoon) return "due_soon";
+            return "normal";
+        }
+    }
 
     /// <summary>
     /// Category name for display purposes
