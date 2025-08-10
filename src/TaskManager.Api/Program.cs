@@ -1,159 +1,94 @@
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Api.Data;
 using TaskManager.Api.Services;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container
-builder.Services.AddControllers();
-
-// Configure Entity Framework with SQLite
-builder.Services.AddDbContext<TaskContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") 
-        ?? "Data Source=taskmanager.db"));
-
-// Add AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-// Register application services
-builder.Services.AddScoped<ITaskService, TaskService>();
-
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-
-// Add CORS for Vue.js frontend
-builder.Services.AddCors(options =>
+namespace TaskManager.Api
 {
-    options.AddPolicy("VueFrontend", policy =>
+    public class Program
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3000") // Vue dev server ports
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
-});
-
-// Add API documentation
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1.1.0", new OpenApiInfo
-    {
-        Title = "TaskManager API",
-        Version = "v1.1.0",
-        Description = "A comprehensive task management API with stored procedure support",
-        Contact = new OpenApiContact
+        public static void Main(string[] args)
         {
-            Name = "Development Team",
-            Email = "arassai75+taskmanager@gmail.com"
+            var builder = WebApplication.CreateBuilder(args);
+
+            // Add services to the container
+            builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
+            // Add AutoMapper
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+            // Add Entity Framework
+            builder.Services.AddDbContext<TaskContext>(options =>
+                options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            // Add services
+            builder.Services.AddScoped<ITaskService, TaskService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+            // Add CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
+
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseCors("AllowAll");
+            app.UseAuthorization();
+            app.MapControllers();
+
+            // Health check endpoint
+            app.MapGet("/health", () => new
+            {
+                Status = "Healthy",
+                Timestamp = DateTime.UtcNow,
+                Version = "1.1.0"
+            });
+
+            // API info endpoint
+            app.MapGet("/api", () => new
+            {
+                Name = "TaskManager API",
+                Version = "1.1.0",
+                Description = "An efficient task management API",
+                Endpoints = new
+                {
+                    Tasks = "/api/tasks",
+                    Statistics = "/api/tasks/statistics",
+                    Health = "/health"
+                }
+            });
+
+            // Initialize database
+            try
+            {
+                using var scope = app.Services.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<TaskContext>();
+                
+                app.Logger.LogInformation("Creating database...");
+                context.Database.EnsureCreated();
+                app.Logger.LogInformation("Database created successfully.");
+            }
+            catch (Exception ex)
+            {
+                app.Logger.LogError(ex, "An error occurred while initializing the database");
+            }
+
+            app.Run();
         }
-    });
-
-    // Include XML comments for better API documentation
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))
-    {
-        c.IncludeXmlComments(xmlPath);
-    }
-});
-
-// Add problem details for better error responses
-builder.Services.AddProblemDetails();
-
-// Add logging
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1.1.0/swagger.json", "TaskManager API v1.1.0");
-        c.RoutePrefix = "swagger";
-        c.DocumentTitle = "TaskManager API Documentation";
-    });
-
-    // Enable detailed error pages in development
-    app.UseDeveloperExceptionPage();
-}
-else
-{
-    // Production error handling
-    app.UseExceptionHandler("/error");
-    app.UseHsts();
-}
-
-// Enable CORS
-app.UseCors("VueFrontend");
-
-// Security headers
-app.UseHttpsRedirection();
-
-// API routing
-app.UseRouting();
-app.UseAuthorization();
-app.MapControllers();
-
-// Health check endpoint
-app.MapGet("/health", () => Results.Ok(new 
-{ 
-    Status = "Healthy", 
-    Timestamp = DateTime.UtcNow,
-    Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown"
-}));
-
-// API info endpoint
-app.MapGet("/api", () => Results.Ok(new
-{
-    Name = "TaskManager API",
-    Version = "1.0.0",
-    Description = "A comprehensive task management API with stored procedure support",
-    Endpoints = new
-    {
-        Tasks = "/api/tasks",
-        Categories = "/api/categories",
-
-        Documentation = "/swagger",
-        Health = "/health"
-    }
-}));
-
-// Error handling endpoint for production
-if (!app.Environment.IsDevelopment())
-{
-    app.MapGet("/error", () => Results.Problem("An error occurred processing your request."));
-}
-
-// Ensure database is created and seeded
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<TaskContext>();
-    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-    
-    try
-    {
-        logger.LogInformation("Applying database migrations...");
-        context.Database.Migrate();
-        
-        logger.LogInformation("Database initialization completed successfully");
-    }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "An error occurred while initializing the database");
-        throw;
     }
 }
-
-// Log startup information
-app.Logger.LogInformation("TaskManager API starting up...");
-app.Logger.LogInformation("Environment: {Environment}", app.Environment.EnvironmentName);
-app.Logger.LogInformation("Swagger UI available at: {SwaggerUrl}", "/swagger");
-
-app.Run();

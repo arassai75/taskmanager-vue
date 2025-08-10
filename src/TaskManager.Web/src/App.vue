@@ -178,9 +178,9 @@
         <div class="mt-8 pt-6 border-t border-gray-700 dark:border-gray-600">
           <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
             <div class="text-gray-400">
-              <span>&copy; 2024 TaskManager. Made with </span>
-              <i class="fas fa-heart text-red-500 mx-1 animate-pulse"></i>
-              <span>for productivity.</span>
+              <span>&copy; 2025 TaskManager.</span>
+              <i class="fas fa-user text-red-500 mx-1 animate-pulse"></i>
+              <span>Ali Rassai</span>
             </div>
             <div class="flex items-center gap-4 text-gray-400">
               <div class="flex items-center gap-2">
