@@ -344,9 +344,9 @@ function handleKeyboard(event: KeyboardEvent) {
 
 // Lifecycle
 onMounted(() => {
-  console.log('🎯 App.vue onMounted() called')
+  console.log('App.vue onMounted() called')
   // Initialize the store
-  console.log('🔧 Calling taskStore.initialize()...')
+  console.log('Calling taskStore.initialize()...')
   taskStore.initialize()
   
   // Set up keyboard shortcuts
@@ -387,17 +387,5 @@ onMounted(() => {
   outline-offset: 2px;
 }
 
-/* Print styles */
-@media print {
-  header,
-  footer,
-  .no-print {
-    display: none !important;
-  }
-  
-  .print-break-inside-avoid {
-    break-inside: avoid;
-  }
-}
 </style>
 

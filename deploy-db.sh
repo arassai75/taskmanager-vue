@@ -56,7 +56,7 @@ backup_database() {
     fi
     
     if [ ! -f "$API_DIR/$db_file" ]; then
-        echo -e "${YELLOW}⚠️  Database file $db_file not found, skipping backup${NC}"
+        echo -e "${YELLOW}  Database file $db_file not found, skipping backup${NC}"
         return 0
     fi
     
@@ -67,10 +67,10 @@ backup_database() {
     local timestamp=$(date +"%Y%m%d_%H%M%S")
     local backup_file="$BACKUP_DIR/${env}_${timestamp}.db"
     
-    echo -e "${BLUE}📦 Creating backup: $backup_file${NC}"
+    echo -e "${BLUE} Creating backup: $backup_file${NC}"
     cp "$API_DIR/$db_file" "$backup_file"
     
-    echo -e "${GREEN}✅ Backup created successfully${NC}"
+    echo -e "${GREEN} Backup created successfully${NC}"
 }
 
 # Function to apply migrations
@@ -93,7 +93,7 @@ apply_migrations() {
     # Check if there are pending migrations
     echo "Checking for pending migrations..."
     if dotnet ef migrations list | grep -q "No migrations"; then
-        echo -e "${YELLOW}⚠️  No migrations found${NC}"
+        echo -e "${YELLOW}  No migrations found${NC}"
         cd - > /dev/null
         return 0
     fi
@@ -102,7 +102,7 @@ apply_migrations() {
     echo "Applying migrations..."
     dotnet ef database update
     
-    echo -e "${GREEN}✅ Migrations applied successfully${NC}"
+    echo -e "${GREEN} Migrations applied successfully${NC}"
     cd - > /dev/null
 }
 
@@ -135,13 +135,13 @@ show_status() {
 # Function to sync dev to production
 sync_to_production() {
     echo -e "${YELLOW}🔄 Syncing development schema to production${NC}"
-    echo -e "${RED}⚠️  WARNING: This will reset the production database!${NC}"
-    echo -e "${RED}⚠️  All production data will be lost!${NC}"
+    echo -e "${RED}  WARNING: This will reset the production database!${NC}"
+    echo -e "${RED}  All production data will be lost!${NC}"
     echo ""
     read -p "Are you absolutely sure? (type 'YES' to continue): " confirm
     
     if [ "$confirm" != "YES" ]; then
-        echo -e "${YELLOW}❌ Sync cancelled${NC}"
+        echo -e "${YELLOW} Sync cancelled${NC}"
         return 1
     fi
     
@@ -172,13 +172,13 @@ reset_database() {
         db_file="taskmanager.db"
     fi
     
-    echo -e "${RED}⚠️  WARNING: This will completely reset the $env database!${NC}"
-    echo -e "${RED}⚠️  All data will be lost!${NC}"
+    echo -e "${RED}  WARNING: This will completely reset the $env database!${NC}"
+    echo -e "${RED}  All data will be lost!${NC}"
     echo ""
     read -p "Are you sure? (type 'YES' to continue): " confirm
     
     if [ "$confirm" != "YES" ]; then
-        echo -e "${YELLOW}❌ Reset cancelled${NC}"
+        echo -e "${YELLOW} Reset cancelled${NC}"
         return 1
     fi
     
@@ -188,20 +188,20 @@ reset_database() {
     # Remove database
     if [ -f "$API_DIR/$db_file" ]; then
         rm "$API_DIR/$db_file"
-        echo -e "${GREEN}✅ Database file removed${NC}"
+        echo -e "${GREEN} Database file removed${NC}"
     fi
     
     # Apply migrations
     apply_migrations "$env"
     
-    echo -e "${GREEN}✅ Database reset completed${NC}"
+    echo -e "${GREEN} Database reset completed${NC}"
 }
 
 # Function to rollback migration
 rollback_migration() {
     local env=$1
     
-    echo -e "${YELLOW}🔄 Rolling back last migration for $env environment${NC}"
+    echo -e "${YELLOW} Rolling back last migration for $env environment${NC}"
     
     cd "$API_DIR"
     
@@ -228,7 +228,7 @@ rollback_migration() {
     local migrations=($(dotnet ef migrations list --no-build | grep -v "Build succeeded" | grep -v "^$" | tail -n +2))
     
     if [ ${#migrations[@]} -lt 2 ]; then
-        echo -e "${YELLOW}⚠️  Cannot rollback - need at least 2 migrations${NC}"
+        echo -e "${YELLOW} Cannot rollback - need at least 2 migrations${NC}"
         cd - > /dev/null
         return 1
     fi
@@ -240,9 +240,9 @@ rollback_migration() {
     
     if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
         dotnet ef database update "$target_migration"
-        echo -e "${GREEN}✅ Rollback completed${NC}"
+        echo -e "${GREEN} Rollback completed${NC}"
     else
-        echo -e "${YELLOW}❌ Rollback cancelled${NC}"
+        echo -e "${YELLOW} Rollback cancelled${NC}"
     fi
     
     cd - > /dev/null
@@ -259,7 +259,7 @@ COMMAND=$2
 
 # Validate environment
 if [ "$ENVIRONMENT" != "dev" ] && [ "$ENVIRONMENT" != "prod" ]; then
-    echo -e "${RED}❌ Invalid environment: $ENVIRONMENT${NC}"
+    echo -e "${RED} Invalid environment: $ENVIRONMENT${NC}"
     echo "Must be 'dev' or 'prod'"
     exit 1
 fi
@@ -284,13 +284,13 @@ case $COMMAND in
         ;;
     sync)
         if [ "$ENVIRONMENT" != "prod" ]; then
-            echo -e "${RED}❌ Sync can only target production environment${NC}"
+            echo -e "${RED} Sync can only target production environment${NC}"
             exit 1
         fi
         sync_to_production
         ;;
     *)
-        echo -e "${RED}❌ Invalid command: $COMMAND${NC}"
+        echo -e "${RED} Invalid command: $COMMAND${NC}"
         show_help
         exit 1
         ;;
