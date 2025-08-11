@@ -78,15 +78,18 @@ export const useTaskStore = defineStore('tasks', () => {
 
   // Actions
   async function fetchTasks(includeCompleted = true) {
+    console.log('fetchTasks called with includeCompleted:', includeCompleted)
     try {
       setLoading(true)
+      console.log('Making API call to getTasks...')
       const fetchedTasks = await apiUtils.retryApiCall(() => 
         taskApi.getTasks(includeCompleted)
       )
+      console.log('Tasks fetched successfully:', fetchedTasks)
       tasks.value = fetchedTasks
       showNotification('success', 'Tasks loaded', `${fetchedTasks.length} tasks loaded successfully`)
     } catch (error) {
-      console.error('❌ Failed to fetch tasks:', error)
+      console.error('Failed to fetch tasks:', error)
       const errorMessage = apiUtils.formatErrorMessage(error)
       setError(errorMessage)
       showNotification('error', 'Failed to load tasks', errorMessage)
@@ -340,6 +343,7 @@ export const useTaskStore = defineStore('tasks', () => {
 
   // Initialize store
   function initialize() {
+    console.log('🚀 TaskStore initialize() called')
     fetchTasks()
     fetchStatistics()
   }

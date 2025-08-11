@@ -49,7 +49,7 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 // Log app information
 console.log('TaskManager Vue App started')
 console.log('Environment:', import.meta.env.MODE)
-console.log('API Base URL:', import.meta.env.VITE_API_BASE_URL || '/api')
+console.log('API URL for tasks:', (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api') + '/tasks')
 
 // Performance monitoring (development only)
 if (import.meta.env.DEV) {
