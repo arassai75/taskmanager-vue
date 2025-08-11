@@ -149,16 +149,4 @@ pkill -f 'dotnet run' && pkill -f 'vite'
 - Check SQLite file permissions
 - Verify database file exists
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test everything works
-5. Submit a pull request
-
-## License
-
-MIT License - feel free to use this project for learning or commercial purposes.
-
 

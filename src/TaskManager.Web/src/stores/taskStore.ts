@@ -30,6 +30,7 @@ export const useTaskStore = defineStore('tasks', () => {
   })
 
   // Computed getters
+  //===============================================
   const activeTasks = computed(() => 
     tasks.value.filter(task => !task.isCompleted)
   )
@@ -77,6 +78,7 @@ export const useTaskStore = defineStore('tasks', () => {
   }))
 
   // Actions
+  //===============================================
   async function fetchTasks(includeCompleted = true) {
     try {
       setLoading(true)
@@ -262,6 +264,7 @@ export const useTaskStore = defineStore('tasks', () => {
   }
 
   // Utility functions
+  //===============================================
   function setLoading(isLoading: boolean, error: string | null = null) {
     loading.value = { isLoading, error }
   }

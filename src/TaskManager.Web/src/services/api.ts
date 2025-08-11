@@ -22,11 +22,11 @@ const api: AxiosInstance = axios.create({
 // Request interceptor for logging and auth (future enhancement)
 api.interceptors.request.use(
   (config) => {
-    console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`)
+    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`)
     return config
   },
   (error) => {
-    console.error('❌ API Request Error:', error)
+    console.error('API Request Error:', error)
     return Promise.reject(error)
   }
 )
@@ -34,11 +34,11 @@ api.interceptors.request.use(
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response: AxiosResponse) => {
-    console.log(`✅ API Response: ${response.status} ${response.config.url}`)
+    console.log(`API Response: ${response.status} ${response.config.url}`)
     return response
   },
   (error: AxiosError) => {
-    console.error('❌ API Response Error:', error)
+    console.error('API Response Error:', error)
     
     // Handle different error scenarios
     if (error.response) {
@@ -192,7 +192,7 @@ export const apiUtils = {
         }
 
         const delay = baseDelay * Math.pow(2, attempt - 1)
-        console.log(`⏳ Retrying API call in ${delay}ms (attempt ${attempt}/${maxRetries})`)
+        console.log(`Retrying API call in ${delay}ms (attempt ${attempt}/${maxRetries})`)
         await new Promise(resolve => setTimeout(resolve, delay))
       }
     }

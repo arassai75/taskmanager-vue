@@ -39,7 +39,7 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "TaskManager API",
-        Version = "v1",
+        Version = "v1.0.0",
         Description = "A comprehensive task management API with stored procedure support",
         Contact = new OpenApiContact
         {

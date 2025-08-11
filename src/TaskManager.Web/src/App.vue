@@ -273,17 +273,5 @@ onMounted(() => {
   outline-offset: 2px;
 }
 
-/* Print styles */
-@media print {
-  header,
-  footer,
-  .no-print {
-    display: none !important;
-  }
-  
-  .print-break-inside-avoid {
-    break-inside: avoid;
-  }
-}
 </style>
 

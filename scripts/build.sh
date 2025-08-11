@@ -5,7 +5,7 @@
 
 set -e  # Exit on any error
 
-echo "🏗️  Building TaskManager for Production"
+echo " Building TaskManager for Production"
 echo "======================================="
 
 # Colors for output
@@ -29,21 +29,21 @@ command_exists() {
 print_color $BLUE "Checking prerequisites..."
 
 if ! command_exists dotnet; then
-    print_color $RED "❌ .NET SDK not found. Please install .NET 8 SDK."
+    print_color $RED ".NET SDK not found. Please install .NET 8 SDK."
     exit 1
 fi
 
 if ! command_exists node; then
-    print_color $RED "❌ Node.js not found. Please install Node.js 18+."
+    print_color $RED "Node.js not found. Please install Node.js 18+."
     exit 1
 fi
 
 if ! command_exists npm; then
-    print_color $RED "❌ npm not found. Please install npm."
+    print_color $RED "npm not found. Please install npm."
     exit 1
 fi
 
-print_color $GREEN "✅ All prerequisites found"
+print_color $GREEN "All prerequisites found"
 
 # Get the script directory and project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -76,7 +76,7 @@ print_color $YELLOW "Building frontend assets..."
 npm run build
 
 if [ $? -ne 0 ]; then
-    print_color $RED "❌ Frontend build failed"
+    print_color $RED "Frontend build failed"
     exit 1
 fi
 
@@ -84,7 +84,7 @@ fi
 print_color $YELLOW "Copying frontend build..."
 cp -r dist "$BUILD_DIR/wwwroot"
 
-print_color $GREEN "✅ Frontend build completed"
+print_color $GREEN "Frontend build completed"
 
 # Build backend
 print_color $BLUE "Building .NET API..."
@@ -99,11 +99,11 @@ print_color $YELLOW "Building API for production..."
 dotnet publish -c Release -o "$BUILD_DIR/api" --no-restore
 
 if [ $? -ne 0 ]; then
-    print_color $RED "❌ Backend build failed"
+    print_color $RED "Backend build failed"
     exit 1
 fi
 
-print_color $GREEN "✅ Backend build completed"
+print_color $GREEN "Backend build completed"
 
 # Copy additional files
 print_color $BLUE "Copying additional files..."
@@ -111,7 +111,7 @@ print_color $BLUE "Copying additional files..."
 # Copy database scripts
 if [ -d "$PROJECT_ROOT/database" ]; then
     cp -r "$PROJECT_ROOT/database" "$BUILD_DIR/"
-    print_color $GREEN "✅ Database scripts copied"
+    print_color $GREEN "Database scripts copied"
 fi
 
 # Copy documentation
@@ -128,7 +128,7 @@ cat > "$BUILD_DIR/start.sh" << 'EOF'
 
 # TaskManager Production Start Script
 
-echo "🚀 Starting TaskManager in Production Mode"
+echo "Starting TaskManager in Production Mode"
 
 # Set production environment
 export ASPNETCORE_ENVIRONMENT=Production
@@ -209,7 +209,7 @@ volumes:
   taskmanager_data:
 EOF
 
-print_color $GREEN "✅ Docker configuration created"
+print_color $GREEN "Docker configuration created"
 
 # Create deployment README
 cat > "$BUILD_DIR/DEPLOYMENT.md" << 'EOF'
@@ -282,7 +282,7 @@ sqlite3 ../taskmanager.db < stored_procedures/sp_task_operations.sql
 - Set up proper authentication (future enhancement)
 EOF
 
-print_color $GREEN "✅ Deployment documentation created"
+print_color $GREEN "Deployment documentation created"
 
 # Generate build info
 print_color $BLUE "Generating build information..."
@@ -332,6 +332,6 @@ print_color $YELLOW "2. Start application: ./start.sh"
 print_color $YELLOW "3. Or deploy with Docker: docker-compose up -d"
 print_color $YELLOW "4. Access at: http://localhost:5000"
 
-print_color $GREEN "\n✅ TaskManager production build ready for deployment!"
+print_color $GREEN "\n TaskManager production build ready for deployment!"
 EOF
 
