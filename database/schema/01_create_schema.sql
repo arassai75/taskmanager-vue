@@ -1,8 +1,6 @@
 -- =============================================
 -- TaskManager Database Schema Creation Script
 -- Description: Creates the initial database structure for the TaskManager application
--- Author: TaskManager Development Team
--- Created: 2024
 -- =============================================
 
 -- Enable foreign key constraints (SQLite specific)

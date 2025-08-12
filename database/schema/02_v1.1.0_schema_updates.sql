@@ -1,7 +1,6 @@
 -- =============================================
 -- TaskManager Database Schema Updates v1.1.0
 -- Description: Adds support for due dates and time estimates
--- Author: TaskManager Development Team
 -- Version: 1.1.0
 -- Features Added:
 --   - Due Dates with optional timestamps
