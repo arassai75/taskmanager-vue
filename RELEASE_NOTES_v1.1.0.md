@@ -9,25 +9,6 @@
 - **Due Dates & Notifications** - Set task deadlines with browser alerts
 - **Time Estimates** - Add hour estimates to tasks for better planning
 
-## New Features
-
-### Dark/Light Theme
-- Toggle between light and dark themes
-- Theme preference saved automatically
-- Smooth transitions between themes
-- Works across all components
-
-### Due Dates & Notifications
-- Add due dates to any task
-- Browser notifications for upcoming deadlines
-- Visual indicators for overdue tasks
-- Smart status badges (Today, Tomorrow, Overdue)
-
-### Time Estimates
-- Add hour estimates to tasks (0.1 to 999.99 hours)
-- Optional field - not required
-- Displayed in task cards and lists
-- Foundation for time tracking
 
 ## Technical Changes
 
@@ -62,21 +43,13 @@
 
 ## UI Improvements
 
-**Task Form:**
 - Date picker for due dates
 - Number input for time estimates
 - Toggle for notifications
-- Better validation feedback
-
-**Task Display:**
 - Due date badges with colors
 - Time estimate display
 - Overdue task highlighting
-- Compact layout improvements
-
-**Theme System:**
 - Theme toggle in header
-- Consistent styling across all components
 - Smooth color transitions
 
 ## Database Schema
@@ -103,27 +76,4 @@
 ./quick-start.sh
 ```
 
-**No new environment variables needed**
 
-## Browser Compatibility
-
-- Modern browsers with notification support
-- Graceful fallback for older browsers
-- Responsive design maintained
-- Progressive enhancement approach
-
-## Known Issues
-
-- None reported
-
-
-## Support
-
-- API docs: https://localhost:7001/swagger
-- Setup guide: README.md
-- Database schema: database/schema/
-
----
-
-**Built for interview demonstration**  
-**Showcasing modern full-stack development**

@@ -110,7 +110,7 @@
               <h3 class="text-xl font-bold text-white">TaskManager</h3>
             </div>
             <p class="text-gray-300 text-sm leading-relaxed">
-              Efficient task management for productive teams. Built with modern technologies for optimal performance.
+              Efficient task management for productive teams.
             </p>
             <div class="flex items-center justify-center md:justify-start gap-1 text-xs text-gray-400">
               <i class="fas fa-rocket text-primary-400"></i>
@@ -163,7 +163,10 @@
               <div class="flex items-center justify-center md:justify-start gap-2 text-sm text-gray-300">
                 <i class="fas fa-server text-green-500"></i>
                 <span>API Status: </span>
-                <span class="text-green-400 font-medium">Online</span>
+                <div class="flex items-center gap-2">
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="text-xs">Live</span>
+              </div>
               </div>
               <div class="flex items-center justify-center md:justify-start gap-2 text-sm text-gray-300">
                 <i class="fas fa-tasks text-blue-500"></i>
@@ -178,18 +181,7 @@
         <div class="mt-8 pt-6 border-t border-gray-700 dark:border-gray-600">
           <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
             <div class="text-gray-400">
-              <span>&copy; 2024 TaskManager. Made with </span>
-              <i class="fas fa-heart text-red-500 mx-1 animate-pulse"></i>
-              <span>for productivity.</span>
-            </div>
-            <div class="flex items-center gap-4 text-gray-400">
-              <div class="flex items-center gap-2">
-                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span class="text-xs">Live</span>
-              </div>
-              <div class="text-xs">
-                {{ new Date().getFullYear() }}
-              </div>
+              <span>&copy; 2025 TaskManager. | Ali Rassai</span>
             </div>
           </div>
         </div>
@@ -352,7 +344,9 @@ function handleKeyboard(event: KeyboardEvent) {
 
 // Lifecycle
 onMounted(() => {
+  console.log('App.vue onMounted() called')
   // Initialize the store
+  console.log('Calling taskStore.initialize()...')
   taskStore.initialize()
   
   // Set up keyboard shortcuts
@@ -393,17 +387,5 @@ onMounted(() => {
   outline-offset: 2px;
 }
 
-/* Print styles */
-@media print {
-  header,
-  footer,
-  .no-print {
-    display: none !important;
-  }
-  
-  .print-break-inside-avoid {
-    break-inside: avoid;
-  }
-}
 </style>
 
