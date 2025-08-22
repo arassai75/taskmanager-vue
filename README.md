@@ -34,14 +34,21 @@ A simple task management application with Vue 3 frontend and .NET 8 backend.
    cd taskmanager
    ```
 
-2. **Run everything:**
+2. **Start the development servers:**
+   This script starts both the API and frontend servers as background processes. It will create log files and PID files for management.
    ```bash
    ./scripts/run-dev.sh
    ```
 
+3. **Stop the development servers:**
+   When you are finished, run this script to safely stop the background processes.
+   ```bash
+   ./scripts/stop-dev.sh
+   ```
+
 3. **Open in browser:**
    - Frontend: http://localhost:5173
-   - API: https://localhost:7001
+   - API: http://localhost:5001
 
 ## Project Structure
 
@@ -106,11 +113,11 @@ pkill -f 'dotnet run' && pkill -f 'vite'
 
 **API:**
 - `ASPNETCORE_ENVIRONMENT=Development`
-- `ASPNETCORE_URLS=https://localhost:7001`
+- `ASPNETCORE_URLS=http://localhost:5001`
 - `ConnectionStrings__DefaultConnection=Data Source=taskmanager.db`
 
 **Frontend:**
-- `VITE_API_BASE_URL=https://localhost:7001/api`
+- `VITE_API_BASE_URL=http://localhost:5001/api`
 
 ## Key Features Explained
 
@@ -148,5 +155,3 @@ pkill -f 'dotnet run' && pkill -f 'vite'
 - Run `./scripts/setup-database.sh` to reset database
 - Check SQLite file permissions
 - Verify database file exists
-
-
